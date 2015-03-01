@@ -32,7 +32,11 @@ router.get('/login', function(req,res){
 	}));
 });
 
-router.get('/user', function(req, res) {
+router.get('/playlists/user/:id', function(req, res) {
+	routes.getUserPlaylists(req, res);
+});
+
+router.get('/user/:id', function(req, res) {
 	routes.getUserInfo(req, res);
 });
 

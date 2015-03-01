@@ -17,9 +17,44 @@ exports.loadUserPage = function (req, res) {
     res.render('userIndex');
 };
 
+exports.getUserPlaylists = function(req, res) {
+	var user = req.params.id;
+	async.waterfall([
+		function(callback) {
+			firebaseRef.child(user).once('value', function(dataSnapshot) {
+				if(dataSnapshot.val().cookie != req.cookies.spotify_auth_state) {
+					console.log("EEEEERRORRRRORORO COOOOKIES");
+					res.json("unauth");
+					return;
+				}
+				callback(null, dataSnapshot.val())
+			})
+		},
+		function(tokens, callback) {
+			console.log("REQUSTING INFO");
+			requestUserPlaylists(tokens.access_token, user, function(error, response, body) {
+				console.log("REQUESTED INFO ", body);
+				if(body.error) {
+					callback(body.error, tokens);
+				}
+				else {
+					callback(null, body);
+				}
+			});
+		}], function(err, result) {
+			if(err) {
+				console.log("ERROR in get user info ", err);
+				var refresh_token = tryRefreshToken(result.refresh_token, req, res);
+				return;
+			};
+			res.json(result);
+		});
+
+}
+
 
 exports.getUserInfo = function(req, res) {
-	var user = req.query.user;
+	var user = req.params.id;
 	console.log("STAAAAATTE KEEEEY: "+req.cookies.spotify_auth_state);
 
 	async.waterfall([
@@ -142,6 +177,18 @@ exports.handleSpotify = function (req, res) {
 	})
 };
 
+function requestUserPlaylists(access_token, id, callback) {
+	var options = {
+		url: 'https://api.spotify.com/v1/users/'+id+'/playlists',
+		headers: { 'Authorization': 'Bearer ' + access_token },
+		json: true
+	};	
+
+	request.get(options, function(error, response, body) {
+		callback(error, response, body);
+	});
+
+}
 
 function requestUserInfoSpotify(access_token, callback) {
 	var options = {

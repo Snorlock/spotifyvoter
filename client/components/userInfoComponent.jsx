@@ -20,11 +20,14 @@ var UserInfo = React.createClass({
     fetchUserInfo: function() {
     	var user = window.location.pathname.substr(1);
     	var that = this;
-    	simpleXhr.get('/user?user='+user, function(response) {
+        console.log("FETCHING");
+    	simpleXhr.get('/user/'+user, function(response) {
     		if(response === 'unauth') {
+                console.log("NO SUCCEESSS");
     			window.location.href = "http://localhost:9001/";
     		}
     		else {
+                console.log("SUCCEESSS");
     			var newState = {
 	    			name: response.display_name,
 	    			image: response.images[0].url
