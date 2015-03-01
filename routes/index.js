@@ -32,9 +32,13 @@ router.get('/login', function(req,res){
 	}));
 });
 
+router.get('/user', function(req, res) {
+	routes.getUserInfo(req, res);
+});
+
 router.get('/:id((\\w+))', function(req, res) {
 	routes.loadUserPage(req, res);
-})
+});
 
 router.get('/spotify-callback', function(req,res){
 	routes.handleSpotify(req,res);

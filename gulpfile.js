@@ -15,11 +15,14 @@ function createBundle(file, watch) {
   var props = watchify.args;
   props.entries = [scriptsDir + '/' + file];
   props.debug = true;
+
+  es6ify.traceurOverrides = {experimental: true};
   
   var bundler = watch ? watchify(browserify(props)) : browserify(props);
   
   bundler.transform(reactify);
-  bundler.transform(es6ify);
+  bundler.transform(es6ify.configure(/.jsx/));
+
   return bundler;
 }
 

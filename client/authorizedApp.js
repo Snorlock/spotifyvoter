@@ -1,8 +1,12 @@
 var React = require('react');
+var UserInfo = require('./components/userInfoComponent.jsx');
 
 var User = React.createClass({
   render: function() {
-    return <div>You are logged in foreverzz</div>
+    return <div>
+    			<h1>You are logged in foreverzz</h1>
+    			<UserInfo/>
+    	   </div>
   }
 });
 
