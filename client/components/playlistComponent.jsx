@@ -4,7 +4,7 @@ var simpleXhr = require('../utils/simpleXhr.js');
 var PlaylistItem = React.createClass({
     render: function() {
         return <li>
-                 <p>{this.props.name} - {this.props.collaborative}</p>
+                 <p>{this.props.name} - {this.props.collaborative} - {this.props.id}</p>
                </li>
     }
 })
@@ -18,8 +18,9 @@ var Playlist = React.createClass({
         if(this.state.playlists) {            
             return <ul>
                   {this.state.playlists.items.map(function(playlist) {
-                       return <PlaylistItem collaborative={"collaborative: "+playlist.collaborative} name = {playlist.name}/>;
-                    })}
+                        if(playlist.collaborative)
+                            return <PlaylistItem collaborative={"collaborative: "+playlist.collaborative} name = {playlist.name} id = {playlist.id}/>;
+                   })}
                </ul>    
         }
         else {

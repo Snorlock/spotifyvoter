@@ -6,6 +6,8 @@ var redirect_uri = 'http://localhost:9001/spotify-callback';
 var client_id = '1fbf71b72e5740368fb9fb5fd9d660d4'
 var client_secret = '3300c68cd181446eb71c47c1f03523d5' 
 var firebaseRef = new Firebase('https://spotifyvoterauth.firebaseio.com/');
+var authRef = firebaseRef.child('auth');
+
 
 var stateKey = 'spotify_auth_state';
 
@@ -21,7 +23,7 @@ exports.getUserPlaylists = function(req, res) {
 	var user = req.params.id;
 	async.waterfall([
 		function(callback) {
-			firebaseRef.child(user).once('value', function(dataSnapshot) {
+			authRef.child(user).once('value', function(dataSnapshot) {
 				if(dataSnapshot.val().cookie != req.cookies.spotify_auth_state) {
 					console.log("EEEEERRORRRRORORO COOOOKIES");
 					res.json("unauth");
@@ -59,7 +61,7 @@ exports.getUserInfo = function(req, res) {
 
 	async.waterfall([
 		function(callback) {
-			firebaseRef.child(user).once('value', function(dataSnapshot) {
+			authRef.child(user).once('value', function(dataSnapshot) {
 				if(dataSnapshot.val().cookie != req.cookies.spotify_auth_state) {
 					console.log("EEEEERRORRRRORORO COOOOKIES");
 					res.json("unauth");
@@ -115,7 +117,7 @@ function tryRefreshToken(refresh_token, req, res) {
 			var access_token = body.access_token;
 			var refresh_token = body.refresh_token;
 			requestUserInfoSpotify(access_token, function(error, response, body) {
-				firebaseRef.child(body.id).update({'access_token':access_token, 'cookie':req.cookies.spotify_auth_state}, function (error){
+				authRef.child(body.id).update({'access_token':access_token, 'cookie':req.cookies.spotify_auth_state}, function (error){
 					if(error) {
 						console.log("ERROOORRR", error);
 					}
@@ -161,7 +163,7 @@ exports.handleSpotify = function (req, res) {
 		},
 		function(atoken, rtoken, callback) {
 			requestUserInfoSpotify(atoken, function(error, response, body) {
-				firebaseRef.child(body.id).set({'access_token':atoken, 'refresh_token': rtoken, 'cookie':req.cookies.spotify_auth_state}, function (error){
+				authRef.child(body.id).set({'access_token':atoken, 'refresh_token': rtoken, 'cookie':req.cookies.spotify_auth_state}, function (error){
 					if(error) {
 						console.log("ERROOORRR", error);
 					}
